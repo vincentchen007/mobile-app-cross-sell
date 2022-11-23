@@ -1,0 +1,54 @@
+Get order data:
+
+select
+    a.order_id, a.user_id, a.restaurant_id, a.order_placed_date, b.ORDER_MENU_ITEM_ARRAY
+from
+    (select
+        order_id, user_id, restaurant_id, order_placed_date
+    from
+        "DW_PROD_BRD"."ORDERS"."ORDERS"
+    where
+        order_status = 'DELIVERED' AND brand_category = 'WONDER_MRC' and TO_DATE(order_placed_date) BETWEEN DATEADD('day', -360, TO_DATE('2022-11-10')) AND TO_DATE('2022-11-10')) a
+        inner join (select * from "DW_PROD_BRD"."ORDERS"."ORDER_ITEM_ARRAYS") b on a.order_id = b.order_id;
+
+Get atc data
+
+select
+    TO_TIMESTAMP((eventtimestamp::bigint)/1000) as time_stamp, TRANSACTION_ID, user_id, restaurant_id, restaurant_name, menu_item_id
+from
+    DW_PROD_BRD.MPARTICLE.CORE_ADD_TO_CART
+where
+    to_date(TO_TIMESTAMP((eventtimestamp::bigint)/1000)) > '2022-11-11'
+
+Get dish-restaurant mapping relationship
+
+select
+    a.dish_id, a.dish_name, a.restaurant_id, b.restaurant_name
+from
+    (select
+        _id as dish_id, name as dish_name, published_restaurant_id as restaurant_id
+    from
+        "DW_PROD_CORE"."RESTAURANT"."PUBLISHED_MENU_ITEMS") a
+inner join (
+    select
+        _id as restaurant_id, name as restaurant_name
+    from
+        "DW_PROD_CORE"."RESTAURANT"."RESTAURANTS"
+) b on a.restaurant_id = b.restaurant_id
+
+
+
+
+reference page:
+
+https://blog.hubspot.com/sales/cross-selling
+
+https://elogii.com/blog/upselling-and-cross-selling-with-delivery/
+
+https://intellipaat.com/blog/data-science-apriori-algorithm/#6
+
+https://stackabuse.com/association-rule-mining-via-apriori-algorithm-in-python/
+
+https://jingwen-z.github.io/association-analysis-apriori-algorithm/
+
+https://efficient-apriori.readthedocs.io/en/latest/
